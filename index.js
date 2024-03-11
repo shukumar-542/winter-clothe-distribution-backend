@@ -27,6 +27,7 @@ async function run() {
         const clothesCollection = db.collection('clothes');
         const testimonialCollection = db.collection('testimonial');
         const volunteersCollection = db.collection('volunteers');
+        const commentCollection = db.collection('comment');
 
         // User Registration
         app.post('/api/v1/register', async (req, res) => {
@@ -147,9 +148,9 @@ async function run() {
             res.json(result)
         });
 
-         // Post volunteers
+        // Post volunteers
 
-         app.post('/api/v1/volunteers' , async(req, res)=>{
+        app.post('/api/v1/volunteers', async (req, res) => {
             const body = req.body
             const result = await volunteersCollection.insertOne(body);
             res.json(result)
@@ -157,11 +158,38 @@ async function run() {
 
         // Post donors testimonials
 
-        app.post('/api/v1/donor-testimonial' , async(req, res)=>{
+        app.post('/api/v1/donor-testimonial', async (req, res) => {
             const body = req.body
             const result = await testimonialCollection.insertOne(body);
             res.json(result)
         })
+        // Post user Comment
+
+        app.post('/api/v1/comment', async (req, res) => {
+            const body = req.body
+            const result = await commentCollection.insertOne(body);
+            res.json(result)
+        })
+
+        app.get('/api/v1/comment', async (req, res) => {
+            const result = await commentCollection.find().toArray();
+            res.json(result)
+        })
+
+        app.post('/api/v1/comment/:id', async (req, res) => {
+            const comment = req.body;
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const updateDoc = {
+                $push: {
+                  comments: comment
+                }
+              }
+              const result = await commentCollection.findOneAndUpdate(query,updateDoc)
+              res.json(result)
+        })
+
+
 
         // Start the server
         app.listen(port, () => {
