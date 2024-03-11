@@ -25,6 +25,8 @@ async function run() {
         const db = client.db('assignment');
         const collection = db.collection('users');
         const clothesCollection = db.collection('clothes');
+        const testimonialCollection = db.collection('testimonial');
+        const volunteersCollection = db.collection('volunteers');
 
         // User Registration
         app.post('/api/v1/register', async (req, res) => {
@@ -67,7 +69,7 @@ async function run() {
                 return res.status(401).json({ message: 'Invalid email or password' });
             }
             // Generate JWT token
-            const token = jwt.sign({ email: user.email , name : user.name}, process.env.JWT_SECRET, { expiresIn: process.env.EXPIRES_IN });
+            const token = jwt.sign({ email: user.email, name: user.name }, process.env.JWT_SECRET, { expiresIn: process.env.EXPIRES_IN });
 
             res.json({
                 success: true,
@@ -134,9 +136,36 @@ async function run() {
         })
 
 
+        // get donors testimonials
+        app.get('/api/v1/donor-testimonial', async (req, res) => {
+            const result = await testimonialCollection.find().toArray();
+            res.json(result)
+        });
+        // get all volunteers
+        app.get('/api/v1/volunteers', async (req, res) => {
+            const result = await volunteersCollection.find().toArray();
+            res.json(result)
+        });
+
+         // Post volunteers
+
+         app.post('/api/v1/volunteers' , async(req, res)=>{
+            const body = req.body
+            const result = await volunteersCollection.insertOne(body);
+            res.json(result)
+        })
+
+        // Post donors testimonials
+
+        app.post('/api/v1/donor-testimonial' , async(req, res)=>{
+            const body = req.body
+            const result = await testimonialCollection.insertOne(body);
+            res.json(result)
+        })
+
         // Start the server
         app.listen(port, () => {
-            console.log(`Server is running on http://localhost:${port}`);
+            console.log(`Server is running on `);
         });
 
     } finally {
